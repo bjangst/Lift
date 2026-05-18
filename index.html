@@ -36,7 +36,6 @@
 
   .exercises { display: flex; flex-direction: column; gap: 12px; }
   .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
-  .ex-card.done { border-color: var(--accent-dim); }
   .ex-card-header { display: flex; align-items: stretch; cursor: pointer; }
   .ex-anim-thumb { width: 80px; flex-shrink: 0; background: #111; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); }
   .ex-anim-thumb svg { width: 80px; height: 70px; }
@@ -58,9 +57,7 @@
   .weight-unit { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
   .reps-done { width: 60px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.85rem; padding: 5px 8px; text-align: center; outline: none; transition: border-color 0.15s; }
   .reps-done:focus { border-color: var(--accent); }
-  .set-check { width: 28px; height: 28px; border-radius: 6px; border: 1.5px solid var(--border); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: transparent; font-size: 0.9rem; transition: all 0.15s; flex-shrink: 0; }
-  .set-check:hover { border-color: var(--accent); }
-  .set-check.checked { background: var(--accent); border-color: var(--accent); color: #0e0e0f; }
+
   .prev-best { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
   .prev-best span { color: var(--accent-dim); }
   .ex-note { margin: 0.5rem 1rem 0.75rem; }
@@ -690,7 +687,7 @@ function renderExercises() {
     const prev = getPrevBest(activeDay, ex.name);
 
     const card = document.createElement('div');
-    card.className = 'ex-card' + (done ? ' done' : '');
+    card.className = 'ex-card';
 
     const hdr = document.createElement('div');
     hdr.className = 'ex-card-header';
@@ -698,7 +695,7 @@ function renderExercises() {
 
     const info = document.createElement('div');
     info.className = 'ex-info';
-    info.innerHTML = `<div class="ex-name">${done ? '✓ ' : ''}${ex.name}</div>
+    info.innerHTML = `<div class="ex-name">${ex.name}</div>
       <div class="ex-badges">
         <span class="badge accent">${ex.sets} sæt</span>
         <span class="badge">${ex.reps} reps</span>
@@ -728,7 +725,7 @@ function renderExercises() {
     setsDiv.className = 'ex-sets';
     const lbl = document.createElement('div');
     lbl.className = 'sets-label';
-    lbl.textContent = 'SÆT  ·  VÆGT (KG)  ·  REPS UDFØRT  ·  KLARET';
+    lbl.textContent = 'SÆT  ·  VÆGT (KG)  ·  REPS UDFØRT';
     setsDiv.appendChild(lbl);
 
     for (let si = 0; si < ex.sets; si++) {
@@ -754,13 +751,8 @@ function renderExercises() {
 
       const rLbl = document.createElement('span'); rLbl.className = 'weight-unit'; rLbl.textContent = 'reps';
 
-      const chk = document.createElement('button');
-      chk.className = 'set-check' + (s.done ? ' checked' : '');
-      chk.innerHTML = '✓';
-      chk.onclick = () => { getState(activeDay, ei, si).done = !getState(activeDay, ei, si).done; saveState(); renderExercises(); updateStats(); };
-
       row.appendChild(num); row.appendChild(wIn); row.appendChild(wLbl);
-      row.appendChild(rIn); row.appendChild(rLbl); row.appendChild(chk);
+      row.appendChild(rIn); row.appendChild(rLbl);
       setsDiv.appendChild(row);
     }
 
