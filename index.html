@@ -20,23 +20,20 @@
     --mono: 'DM Mono', monospace; --sans: 'Syne', sans-serif;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
-  header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-  .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; color: var(--accent); }
-  .logo span { color: var(--muted); font-weight: 400; }
-  .week-label { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em; }
-  .day-nav { display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-  .day-nav::-webkit-scrollbar { display: none; }
+
+  .day-nav { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: var(--sans); font-size: 1.1rem; font-weight: 800; color: var(--accent); padding: 0 1.25rem; display: flex; align-items: center; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .nav-days { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; flex: 1; justify-content: flex-start; }
+  .nav-days::-webkit-scrollbar { display: none; }
+
   .day-btn { flex-shrink: 0; padding: 1rem 1.25rem; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: var(--sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .day-btn:hover { color: var(--text); }
   .day-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
   .day-focus { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); display: block; margin-top: 2px; font-weight: 400; }
   .main { padding: 1.5rem; max-width: 900px; }
-  .day-header { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+  .day-header { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 0.75rem; }
   .day-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
-  .progress-bar-wrap { display: flex; align-items: center; gap: 0.75rem; }
-  .progress-bar { width: 120px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; }
-  .progress-text { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+
   .exercises { display: flex; flex-direction: column; gap: 12px; }
   .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
   .ex-card.done { border-color: var(--accent-dim); }
@@ -80,20 +77,11 @@
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <div class="logo">LIFT</div>
-    <div class="week-label">DIT UGENTLIGE PROGRAM</div>
-  </div>
-</header>
-<nav class="day-nav" id="dayNav"></nav>
+
+<nav class="day-nav"><div class="nav-logo">LIFT</div><div class="nav-days" id="dayNav"></div></nav>
 <div class="main">
   <div class="day-header">
     <div class="day-title" id="dayTitle"></div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-text" id="progressText">0 / 0 sæt</div>
-    </div>
   </div>
   <div class="exercises" id="exerciseList"></div>
   <div class="spacer"></div>
@@ -145,6 +133,8 @@ const program = {
     { name: "Seated Triceps Press", sets: 3, reps: "10–15", muscle: "Triceps" },
     { name: "Dumbbell Skullcrusher", sets: 2, reps: "10–15", muscle: "Triceps" },
   ]},
+  "Lørdag": { focus: "Chill", exercises: [] },
+  "Søndag": { focus: "Chill", exercises: [] },
 };
 
 // ─── ANIMATED SVG FIGURES ──────────────────────────────────────────────
@@ -663,11 +653,7 @@ function getDoneSets() {
 }
 function isExDone(day, ei, sets) { for (let si = 0; si < sets; si++) if (!getState(day, ei, si).done) return false; return true; }
 
-function updateStats() {
-  const total = getTotalSets(), done = getDoneSets();
-  document.getElementById('progressFill').style.width = (total > 0 ? done/total*100 : 0) + '%';
-  document.getElementById('progressText').textContent = done + ' / ' + total + ' sæt';
-}
+function updateStats() {}
 
 function renderNav() {
   const nav = document.getElementById('dayNav');
@@ -691,6 +677,13 @@ function renderExercises() {
   const list = document.getElementById('exerciseList');
   const exs = program[activeDay].exercises;
   list.innerHTML = '';
+  if (exs.length === 0) {
+    const chill = document.createElement('div');
+    chill.style.cssText = 'text-align:center; padding: 4rem 1rem; color: var(--muted);';
+    chill.innerHTML = '<div style="font-size:3rem; margin-bottom:1rem;">😎</div><div style="font-family:var(--sans); font-size:1.4rem; font-weight:800; color:var(--accent); letter-spacing:-0.02em;">Chill dag</div><div style="font-family:var(--mono); font-size:0.8rem; margin-top:0.5rem;">Hvil dig — du fortjener det</div>';
+    list.appendChild(chill);
+    return;
+  }
   exs.forEach((ex, ei) => {
     const isOpen = !!(openCards[activeDay]?.[ei]);
     const done = isExDone(activeDay, ei, ex.sets);
