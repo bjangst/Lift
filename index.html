@@ -802,7 +802,7 @@ function saveWorkout() {
     if (history[day][ex.name].length > 10) history[day][ex.name].shift();
   });
   saveState();
-  showToast('✓ Træning gemt for ' + day);
+  showFireworks();
 }
 
 function showToast(msg) {
@@ -811,9 +811,81 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+function showFireworks() {
+  const overlay = document.getElementById('fw-overlay');
+  const canvas = document.getElementById('fw-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  overlay.style.display = 'flex';
+
+  const particles = [];
+  const colors = ['#c8f065','#ffffff','#4a9eff','#ff6b6b','#ffd93d','#a8ff78','#ff9ff3'];
+
+  function spawnBurst(x, y) {
+    for (let i = 0; i < 80; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 8 + 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 5 + 2,
+        gravity: 0.15
+      });
+    }
+  }
+
+  // Multiple bursts
+  const bursts = [
+    [canvas.width * 0.2, canvas.height * 0.3],
+    [canvas.width * 0.8, canvas.height * 0.25],
+    [canvas.width * 0.5, canvas.height * 0.2],
+    [canvas.width * 0.15, canvas.height * 0.6],
+    [canvas.width * 0.85, canvas.height * 0.5],
+  ];
+  bursts.forEach(([x,y], i) => setTimeout(() => spawnBurst(x, y), i * 180));
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
+      p.alpha -= 0.018; p.vx *= 0.99;
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    frame++;
+    if (frame < 160) requestAnimationFrame(animate);
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  animate();
+
+  setTimeout(() => { overlay.style.display = 'none'; }, 3200);
+}
+
 loadState();
 openCards[activeDay] = { 0: true };
 renderAll();
 </script>
+<div id="fw-overlay" style="display:none; position:fixed; inset:0; z-index:999; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
+  <canvas id="fw-canvas" style="position:absolute; inset:0;"></canvas>
+  <div style="position:relative; z-index:2; text-align:center; animation: pump-in 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards;">
+    <div style="font-family:'Syne',sans-serif; font-size:clamp(2.5rem,10vw,5rem); font-weight:800; color:#c8f065; letter-spacing:-0.03em; text-shadow: 0 0 40px rgba(200,240,101,0.6);">GREAT</div>
+    <div style="font-family:'Syne',sans-serif; font-size:clamp(2.5rem,10vw,5rem); font-weight:800; color:#ffffff; letter-spacing:-0.03em; margin-top:-0.2em;">PUMP</div>
+  </div>
+</div>
+<style>
+@keyframes pump-in {
+  0% { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
 </body>
 </html>
