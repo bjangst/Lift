@@ -37,8 +37,8 @@
   .exercises { display: flex; flex-direction: column; gap: 12px; }
   .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
   .ex-card-header { display: flex; align-items: stretch; cursor: pointer; }
-  .ex-anim-thumb { width: 80px; flex-shrink: 0; background: #111; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); }
-  .ex-anim-thumb svg { width: 80px; height: 70px; }
+  .ex-anim-thumb { width: 110px; flex-shrink: 0; background: #111; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); }
+  .ex-anim-thumb svg { width: 110px; height: 90px; }
   .ex-info { flex: 1; padding: 0.75rem 1rem; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   .ex-name { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
   .ex-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
@@ -94,12 +94,12 @@ const program = {
     { name: "Barbell Bench Press", sets: 4, reps: "5–8", muscle: "Bryst" },
     { name: "Incline Dumbbell Press", sets: 3, reps: "8–10", muscle: "Øvre bryst" },
     { name: "Dumbbell Shoulder Press", sets: 3, reps: "8–10", muscle: "Skuldre" },
-    { name: "Single Arm Lateral Raise", sets: 3, reps: "12–20", muscle: "Side-delt" },
+    { name: "Single-Arm Lateral Raise", sets: 3, reps: "12–20", muscle: "Side-delt" },
     { name: "Overhead Cable Triceps Ext.", sets: 3, reps: "10–15", muscle: "Triceps" },
-    { name: "1-Arm Triceps Cable Press Down", sets: 2, reps: "12–15", muscle: "Triceps" },
+    { name: "One-Arm Cable Pushdown", sets: 2, reps: "12–15", muscle: "Triceps" },
   ]},
   Tirsdag: { focus: "Pull", exercises: [
-    { name: "Chest-supported DB Rows", sets: 3, reps: "8–12", muscle: "Ryg" },
+    { name: "Chest-Supported Dumbbell Row", sets: 3, reps: "8–12", muscle: "Ryg" },
     { name: "Single Arm Dumbbell Row", sets: 3, reps: "8–12", muscle: "Ryg" },
     { name: "Dumbbell Deadlift", sets: 3, reps: "8–10", muscle: "Baglår · Ryg" },
     { name: "Incline Dumbbell Curls", sets: 3, reps: "10–12", muscle: "Biceps" },
@@ -108,19 +108,19 @@ const program = {
   ]},
   Onsdag: { focus: "Push", exercises: [
     { name: "Dumbbell Chest Fly", sets: 3, reps: "10–15", muscle: "Bryst" },
-    { name: "Low-To-High Cable Chest Flye", sets: 3, reps: "12–15", muscle: "Nedre bryst" },
-    { name: "Dumbbell Lateral Raises", sets: 3, reps: "12–20", muscle: "Side-delt" },
+    { name: "Low-to-High Cable Fly", sets: 3, reps: "12–15", muscle: "Nedre bryst" },
+    { name: "Dumbbell Lateral Raise", sets: 3, reps: "12–20", muscle: "Side-delt" },
     { name: "Cable Rear Delt Fly", sets: 3, reps: "12–20", muscle: "Bag-delt" },
-    { name: "Cable Triceps Press Down", sets: 3, reps: "10–15", muscle: "Triceps" },
+    { name: "Cable Triceps Pushdown (Rope)", sets: 3, reps: "10–15", muscle: "Triceps" },
     { name: "Cross-Body Cable Triceps Ext.", sets: 2, reps: "12–15", muscle: "Triceps" },
   ]},
   Torsdag: { focus: "Pull", exercises: [
-    { name: "Kneeling Cable Lat Pulldown", sets: 3, reps: "8–12", muscle: "Lats" },
-    { name: "Straight Arm Pulldown", sets: 3, reps: "12–15", muscle: "Lats" },
+    { name: "Single-Arm Kneeling Lat Pulldown", sets: 3, reps: "8–12", muscle: "Lats" },
+    { name: "Straight-Arm Pulldown", sets: 3, reps: "12–15", muscle: "Lats" },
     { name: "Seated Cable Rows", sets: 3, reps: "8–12", muscle: "Midt-ryg" },
     { name: "Cable Curls", sets: 3, reps: "10–15", muscle: "Biceps" },
-    { name: "EZ-bar Curls", sets: 3, reps: "8–12", muscle: "Biceps" },
-    { name: "EZ-bar Reverse Curl", sets: 2, reps: "12–15", muscle: "Underarm · Biceps" },
+    { name: "EZ-Bar Curls", sets: 3, reps: "8–12", muscle: "Biceps" },
+    { name: "EZ-Bar Reverse Curl", sets: 2, reps: "12–15", muscle: "Underarm · Biceps" },
   ]},
   Fredag: { focus: "Push", exercises: [
     { name: "Cable Crossover", sets: 3, reps: "12–15", muscle: "Bryst" },
@@ -136,485 +136,581 @@ const program = {
 
 // ─── ANIMATED SVG FIGURES ──────────────────────────────────────────────
 function getAnim(name) {
+  // viewBox scaled to show full figure comfortably
+  // All figures: head (r=8), neck (4px line), torso (5px), arms/legs (4px)
+  // Animations show the correct movement for each exercise
+
   const a = {
-    "Barbell Bench Press": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="30" y="72" width="120" height="10" rx="3" fill="#222"/>
-      <rect x="30" y="62" width="120" height="10" rx="3" fill="#2a2a2c"/>
-      <g id="bp_body">
-        <ellipse cx="90" cy="54" rx="9" ry="9" fill="#4a9eff"/>
-        <rect x="75" y="54" width="30" height="14" rx="4" fill="#4a9eff"/>
-        <line x1="75" y1="60" x2="55" y2="52" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="105" y1="60" x2="125" y2="52" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="55" y1="52" x2="50" y2="64" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
-        <line x1="125" y1="52" x2="130" y2="64" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+
+    "Barbell Bench Press": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="75" width="140" height="7" rx="3" fill="#333"/>
+      <rect x="30" y="67" width="120" height="8" rx="3" fill="#2a2a2c"/>
+      <!-- lying figure: head left, legs right -->
+      <circle cx="34" cy="62" r="8" fill="#4a9eff"/>
+      <line x1="42" y1="62" x2="50" y2="62" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="62" x2="130" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="130" y1="62" x2="150" y2="56" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="130" y1="62" x2="148" y2="68" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms pushing bar up/down -->
+      <g id="bp_arms">
+        <line x1="72" y1="62" x2="64" y2="46" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="94" y1="62" x2="102" y2="46" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="32" y="42" width="116" height="5" rx="2" fill="#7cc4ff"/>
+        <circle cx="32" cy="44" r="7" fill="#5ba8e0"/>
+        <circle cx="148" cy="44" r="7" fill="#5ba8e0"/>
       </g>
-      <g id="bp_bar">
-        <rect x="28" y="38" width="124" height="6" rx="3" fill="#7cc4ff"/>
-        <circle cx="28" cy="41" r="7" fill="#5ba8e0"/>
-        <circle cx="152" cy="41" r="7" fill="#5ba8e0"/>
-      </g>
-      <animateTransform xlink:href="#bp_bar" attributeName="transform" type="translate" values="0,0;0,14;0,0" dur="2s" repeatCount="indefinite"/>
-      <animate xlink:href="#bp_bar" attributeName="opacity" values="1;1;1" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#bp_arms" attributeName="transform" type="translate" values="0,0;0,13;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Incline Dumbbell Press": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="20" y="58" width="90" height="10" rx="3" fill="#2a2a2c" transform="rotate(-22 65 63)"/>
-      <rect x="18" y="80" width="32" height="14" rx="3" fill="#222"/>
-      <ellipse cx="82" cy="42" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="68" y="42" width="28" height="14" rx="4" fill="#4a9eff"/>
+    "Incline Dumbbell Press": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="52" width="88" height="7" rx="3" fill="#2a2a2c" transform="rotate(-22 58 55)"/>
+      <rect x="14" y="74" width="28" height="16" rx="3" fill="#333"/>
+      <!-- seated reclined figure -->
+      <circle cx="88" cy="30" r="8" fill="#4a9eff"/>
+      <line x1="88" y1="38" x2="88" y2="42" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="88" y1="42" x2="74" y2="64" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="74" y1="64" x2="54" y2="76" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="idp_arms">
-        <line x1="68" y1="50" x2="48" y2="40" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="96" y1="50" x2="118" y2="40" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="38" y="36" width="14" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="35" cy="38" r="5" fill="#5ba8e0"/>
-        <circle cx="52" cy="38" r="5" fill="#5ba8e0"/>
-        <rect x="118" y="36" width="14" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="115" cy="38" r="5" fill="#5ba8e0"/>
-        <circle cx="132" cy="38" r="5" fill="#5ba8e0"/>
+        <line x1="88" y1="48" x2="66" y2="36" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="88" y1="48" x2="110" y2="36" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="52" y="32" width="14" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="50" cy="34" r="5" fill="#5ba8e0"/><circle cx="66" cy="34" r="5" fill="#5ba8e0"/>
+        <rect x="110" y="32" width="14" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="108" cy="34" r="5" fill="#5ba8e0"/><circle cx="124" cy="34" r="5" fill="#5ba8e0"/>
       </g>
       <animateTransform xlink:href="#idp_arms" attributeName="transform" type="translate" values="0,0;0,12;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Dumbbell Shoulder Press": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="55" y="68" width="70" height="28" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="52" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="76" y="52" width="28" height="16" rx="4" fill="#4a9eff"/>
+    "Dumbbell Shoulder Press": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="72" width="64" height="18" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="32" x2="90" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="36" x2="90" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="74" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="106" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms press upward -->
       <g id="dsp_arms">
-        <line x1="76" y1="58" x2="50" y2="44" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="104" y1="58" x2="130" y2="44" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="36" y="39" width="16" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="33" cy="41" r="5" fill="#5ba8e0"/>
-        <circle cx="52" cy="41" r="5" fill="#5ba8e0"/>
-        <rect x="128" y="39" width="16" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="125" cy="41" r="5" fill="#5ba8e0"/>
-        <circle cx="144" cy="41" r="5" fill="#5ba8e0"/>
+        <line x1="90" y1="46" x2="60" y2="38" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="46" x2="120" y2="38" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="42" y="33" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="40" cy="35" r="5" fill="#5ba8e0"/><circle cx="58" cy="35" r="5" fill="#5ba8e0"/>
+        <rect x="122" y="33" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="120" cy="35" r="5" fill="#5ba8e0"/><circle cx="138" cy="35" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#dsp_arms" attributeName="transform" type="translate" values="0,0;0,-14;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#dsp_arms" attributeName="transform" type="translate" values="0,0;0,-16;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Single Arm Lateral Raise": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="55" y="68" width="60" height="28" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="85" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="76" y="50" width="18" height="18" rx="4" fill="#4a9eff"/>
-      <line x1="76" y1="58" x2="60" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Single-Arm Lateral Raise": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="72" width="54" height="18" rx="4" fill="#2a2a2c"/>
+      <circle cx="85" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="85" y1="32" x2="85" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="85" y1="36" x2="85" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="85" y1="72" x2="70" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="85" y1="72" x2="100" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- left arm hangs, right arm raises sideways -->
+      <line x1="85" y1="48" x2="62" y2="54" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="slr_arm">
-        <line x1="94" y1="58" x2="128" y2="52" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="128" y="48" width="14" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="125" cy="50" r="5" fill="#5ba8e0"/>
-        <circle cx="142" cy="50" r="5" fill="#5ba8e0"/>
+        <line x1="85" y1="48" x2="120" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="118" y="39" width="14" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="116" cy="41" r="5" fill="#5ba8e0"/><circle cx="132" cy="41" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#slr_arm" attributeName="transform" type="translate" values="0,0;0,-16;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#slr_arm" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Overhead Cable Triceps Ext.": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="145" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="151" cy="18" r="6" fill="#444"/>
-      <line x1="151" y1="24" x2="108" y2="40" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="55" y="68" width="65" height="28" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="88" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="50" width="20" height="18" rx="4" fill="#4a9eff"/>
-      <g id="oct_arms">
-        <line x1="78" y1="54" x2="62" y2="38" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="98" y1="54" x2="112" y2="38" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="56" y="26" width="60" height="6" rx="3" fill="#7cc4ff"/>
-        <circle cx="54" cy="29" r="5" fill="#5ba8e0"/>
-        <circle cx="118" cy="29" r="5" fill="#5ba8e0"/>
+    "Overhead Cable Triceps Ext.": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="0" width="10" height="100" rx="3" fill="#222"/>
+      <circle cx="155" cy="14" r="5" fill="#444"/>
+      <line x1="155" y1="19" x2="108" y2="38" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="55" y="72" width="58" height="18" rx="4" fill="#2a2a2c"/>
+      <circle cx="84" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="84" y1="32" x2="84" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="84" y1="36" x2="84" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="84" y1="72" x2="68" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="84" y1="72" x2="100" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- both arms overhead, forearms extend down then up -->
+      <line x1="84" y1="44" x2="62" y2="32" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="84" y1="44" x2="106" y2="32" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <g id="oct_forearms">
+        <line x1="62" y1="32" x2="66" y2="14" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="106" y1="32" x2="102" y2="14" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="60" y="8" width="46" height="5" rx="2" fill="#7cc4ff"/>
       </g>
-      <animateTransform xlink:href="#oct_arms" attributeName="transform" type="translate" values="0,0;0,14;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#oct_forearms" attributeName="transform" type="translate" values="0,0;0,16;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "1-Arm Triceps Cable Press Down": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="145" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="151" cy="20" r="6" fill="#444"/>
-      <line x1="151" y1="26" x2="108" y2="42" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="55" y="60" width="65" height="36" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="88" cy="46" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="46" width="20" height="14" rx="4" fill="#4a9eff"/>
-      <line x1="78" y1="50" x2="62" y2="44" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <g id="tpd_arm">
-        <line x1="98" y1="50" x2="110" y2="44" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="110" y1="44" x2="112" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "One-Arm Cable Pushdown": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="0" width="10" height="100" rx="3" fill="#222"/>
+      <circle cx="155" cy="16" r="5" fill="#444"/>
+      <line x1="155" y1="21" x2="112" y2="38" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="46" y="62" width="66" height="28" rx="4" fill="#2a2a2c"/>
+      <circle cx="80" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="80" y1="30" x2="80" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="80" y1="34" x2="80" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="80" y1="62" x2="64" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="62" x2="96" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- left arm relaxed at side, right upper arm fixed, forearm pushes down -->
+      <line x1="80" y1="44" x2="58" y2="50" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="44" x2="108" y2="38" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <g id="tpd_forearm">
+        <line x1="108" y1="38" x2="110" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#tpd_arm" attributeName="transform" type="translate" values="0,-14;0,0;0,-14" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#tpd_forearm" attributeName="transform" type="translate" values="0,-18;0,0;0,-18" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Chest-supported DB Rows": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="25" y="52" width="110" height="12" rx="4" fill="#2a2a2c" transform="rotate(-8 80 58)"/>
-      <rect x="18" y="78" width="36" height="18" rx="4" fill="#222"/>
-      <rect x="126" y="72" width="36" height="18" rx="4" fill="#222"/>
-      <ellipse cx="90" cy="40" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="40" width="24" height="14" rx="4" fill="#4a9eff"/>
+    "Chest-Supported Dumbbell Row": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="46" width="112" height="8" rx="3" fill="#2a2a2c" transform="rotate(-8 74 50)"/>
+      <rect x="14" y="74" width="34" height="16" rx="3" fill="#333"/>
+      <rect x="128" y="68" width="34" height="16" rx="3" fill="#333"/>
+      <!-- figure lying on incline bench -->
+      <circle cx="90" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="32" x2="90" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="36" x2="90" y2="58" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <!-- arms row upward from hanging position -->
       <g id="csdr_arms">
-        <line x1="78" y1="48" x2="52" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="48" x2="128" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="36" y="56" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="33" cy="58" r="5" fill="#5ba8e0"/>
-        <circle cx="54" cy="58" r="5" fill="#5ba8e0"/>
-        <rect x="126" y="56" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="123" cy="58" r="5" fill="#5ba8e0"/>
-        <circle cx="144" cy="58" r="5" fill="#5ba8e0"/>
+        <line x1="90" y1="48" x2="54" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="48" x2="126" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="36" y="57" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="34" cy="59" r="5" fill="#5ba8e0"/><circle cx="52" cy="59" r="5" fill="#5ba8e0"/>
+        <rect x="128" y="57" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="126" cy="59" r="5" fill="#5ba8e0"/><circle cx="144" cy="59" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#csdr_arms" attributeName="transform" type="translate" values="0,0;0,-16;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#csdr_arms" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Single Arm Dumbbell Row": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="10" y="72" width="160" height="10" rx="3" fill="#222"/>
-      <rect x="10" y="60" width="50" height="12" rx="3" fill="#2a2a2c"/>
-      <ellipse cx="100" cy="48" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="88" y="48" width="24" height="20" rx="4" fill="#4a9eff"/>
-      <line x1="88" y1="54" x2="55" y2="64" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="112" y1="64" x2="112" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Single Arm Dumbbell Row": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="78" width="160" height="8" rx="3" fill="#333"/>
+      <rect x="10" y="64" width="44" height="14" rx="3" fill="#2a2a2c"/>
+      <!-- figure bent over, one hand on bench -->
+      <circle cx="96" cy="26" r="8" fill="#4a9eff"/>
+      <line x1="96" y1="34" x2="96" y2="38" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="96" y1="38" x2="84" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="84" y1="62" x2="60" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="84" y1="62" x2="108" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- support arm to bench -->
+      <line x1="84" y1="50" x2="52" y2="68" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- rowing arm: elbow bends, pulls dumbbell up -->
       <g id="sadr_arm">
-        <line x1="112" y1="54" x2="136" y2="44" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="134" y="39" width="16" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="131" cy="41" r="5" fill="#5ba8e0"/>
-        <circle cx="150" cy="41" r="5" fill="#5ba8e0"/>
+        <line x1="84" y1="50" x2="128" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="126" y="35" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="124" cy="37" r="5" fill="#5ba8e0"/><circle cx="142" cy="37" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#sadr_arm" attributeName="transform" type="translate" values="0,0;0,16;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#sadr_arm" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Dumbbell Deadlift": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
+    "Dumbbell Deadlift": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <!-- figure stands up from hinge -->
       <g id="ddl_body">
-        <ellipse cx="90" cy="34" rx="9" ry="9" fill="#4a9eff"/>
-        <rect x="78" y="34" width="24" height="22" rx="4" fill="#4a9eff"/>
-        <line x1="78" y1="50" x2="55" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="50" x2="125" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="55" y1="62" x2="52" y2="85" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="125" y1="62" x2="128" y2="85" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="78" y1="42" x2="48" y2="68" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="42" x2="132" y2="68" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="34" y="63" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="31" cy="65" r="5" fill="#5ba8e0"/>
-        <circle cx="52" cy="65" r="5" fill="#5ba8e0"/>
-        <rect x="128" y="63" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="125" cy="65" r="5" fill="#5ba8e0"/>
-        <circle cx="146" cy="65" r="5" fill="#5ba8e0"/>
+        <circle cx="90" cy="18" r="8" fill="#4a9eff"/>
+        <line x1="90" y1="26" x2="90" y2="30" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="90" y1="30" x2="90" y2="58" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="90" y1="58" x2="72" y2="80" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="58" x2="108" y2="80" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <!-- arms hang straight down holding dumbbells -->
+        <line x1="90" y1="40" x2="52" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="40" x2="128" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="34" y="57" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="32" cy="59" r="5" fill="#5ba8e0"/><circle cx="50" cy="59" r="5" fill="#5ba8e0"/>
+        <rect x="130" y="57" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="128" cy="59" r="5" fill="#5ba8e0"/><circle cx="146" cy="59" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#ddl_body" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2.2s" repeatCount="indefinite"/>
+      <!-- whole body rises from bent-over to standing -->
+      <animateTransform xlink:href="#ddl_body" attributeName="transform" type="translate" values="0,18;0,0;0,18" dur="2.2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Incline Dumbbell Curls": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="30" y="52" width="80" height="12" rx="4" fill="#2a2a2c" transform="rotate(-32 70 58)"/>
-      <rect x="22" y="80" width="36" height="22" rx="4" fill="#222"/>
-      <ellipse cx="80" cy="36" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="68" y="36" width="24" height="16" rx="4" fill="#4a9eff"/>
-      <line x1="68" y1="46" x2="50" y2="38" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Incline Dumbbell Curls": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="26" y="46" width="78" height="8" rx="3" fill="#2a2a2c" transform="rotate(-32 65 50)"/>
+      <rect x="18" y="78" width="34" height="18" rx="4" fill="#333"/>
+      <!-- seated on incline, arms hang then curl up -->
+      <circle cx="88" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="88" y1="32" x2="88" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="88" y1="36" x2="76" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="76" y1="60" x2="52" y2="72" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="76" y1="60" x2="92" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="76" y1="48" x2="52" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="idc_arm">
-        <line x1="92" y1="46" x2="120" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="118" y="58" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="115" cy="60" r="5" fill="#5ba8e0"/>
-        <circle cx="136" cy="60" r="5" fill="#5ba8e0"/>
+        <line x1="76" y1="48" x2="116" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="112" y="57" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="110" cy="59" r="5" fill="#5ba8e0"/><circle cx="128" cy="59" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#idc_arm" attributeName="transform" type="rotate" values="0 92 46;-38 92 46;0 92 46" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#idc_arm" attributeName="transform" type="rotate" values="0 76 48;-42 76 48;0 76 48" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Hammer Curls": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="60" y="68" width="60" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
-      <line x1="102" y1="60" x2="120" y2="58" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Hammer Curls": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="70" width="60" height="20" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- right arm relaxed, left arm curls neutrally (palm facing in) -->
+      <line x1="90" y1="48" x2="114" y2="54" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="hc_arm">
-        <line x1="78" y1="60" x2="52" y2="50" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="52" y1="50" x2="50" y2="28" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="40" y="22" width="16" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="37" cy="24" r="5" fill="#5ba8e0"/>
-        <circle cx="56" cy="24" r="5" fill="#5ba8e0"/>
+        <line x1="90" y1="48" x2="60" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="60" y1="44" x2="56" y2="22" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="44" y="16" width="14" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="42" cy="18" r="5" fill="#5ba8e0"/><circle cx="58" cy="18" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#hc_arm" attributeName="transform" type="translate" values="0,0;0,20;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#hc_arm" attributeName="transform" type="translate" values="0,0;0,22;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Preacher Curls": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="30" y="55" width="100" height="12" rx="4" fill="#2a2a2c" transform="rotate(-18 80 61)"/>
-      <rect x="24" y="78" width="100" height="18" rx="4" fill="#222"/>
-      <ellipse cx="88" cy="40" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="76" y="40" width="24" height="15" rx="4" fill="#4a9eff"/>
-      <line x1="76" y1="50" x2="55" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <g id="pc_arm">
-        <line x1="100" y1="48" x2="128" y2="34" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="124" y="28" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="121" cy="30" r="5" fill="#5ba8e0"/>
-        <circle cx="142" cy="30" r="5" fill="#5ba8e0"/>
+    "Preacher Curls": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="26" y="50" width="100" height="8" rx="3" fill="#2a2a2c" transform="rotate(-18 76 54)"/>
+      <rect x="20" y="78" width="105" height="14" rx="4" fill="#333"/>
+      <circle cx="100" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="100" y1="30" x2="100" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="34" x2="92" y2="58" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="92" y1="58" x2="68" y2="66" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="92" y1="58" x2="108" y2="76" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- upper arm rests on pad, forearm curls up -->
+      <line x1="92" y1="46" x2="66" y2="58" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <g id="pc_forearm">
+        <line x1="66" y1="58" x2="52" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="38" y="34" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="36" cy="36" r="5" fill="#5ba8e0"/><circle cx="54" cy="36" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#pc_arm" attributeName="transform" type="rotate" values="0 100 48;-40 100 48;0 100 48" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#pc_forearm" attributeName="transform" type="rotate" values="0 66 58;-38 66 58;0 66 58" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Dumbbell Chest Fly": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="20" y="72" width="140" height="10" rx="3" fill="#222"/>
-      <rect x="30" y="62" width="120" height="10" rx="3" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="54" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="54" width="24" height="12" rx="4" fill="#4a9eff"/>
+    "Dumbbell Chest Fly": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="74" width="144" height="7" rx="3" fill="#333"/>
+      <rect x="28" y="66" width="124" height="8" rx="3" fill="#2a2a2c"/>
+      <circle cx="90" cy="54" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="62" x2="90" y2="66" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="66" y1="66" x2="114" y2="66" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="66" y1="66" x2="50" y2="70" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="114" y1="66" x2="130" y2="70" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms fly out wide then come together -->
       <g id="dcf_arms">
-        <line x1="78" y1="58" x2="44" y2="50" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="58" x2="136" y2="50" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="28" y="45" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="25" cy="47" r="5" fill="#5ba8e0"/>
-        <circle cx="46" cy="47" r="5" fill="#5ba8e0"/>
-        <rect x="134" y="45" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="131" cy="47" r="5" fill="#5ba8e0"/>
-        <circle cx="152" cy="47" r="5" fill="#5ba8e0"/>
+        <line x1="66" y1="66" x2="30" y2="56" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="114" y1="66" x2="150" y2="56" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="12" y="51" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="10" cy="53" r="5" fill="#5ba8e0"/><circle cx="28" cy="53" r="5" fill="#5ba8e0"/>
+        <rect x="152" y="51" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="150" cy="53" r="5" fill="#5ba8e0"/><circle cx="168" cy="53" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#dcf_arms" attributeName="transform" type="translate" values="0,0;0,-20;0,0" dur="2.2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#dcf_arms" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2.2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Low-To-High Cable Chest Flye": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <rect x="160" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="88" r="6" fill="#444"/>
-      <circle cx="166" cy="88" r="6" fill="#444"/>
-      <rect x="62" y="68" width="56" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="48" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="48" width="24" height="20" rx="4" fill="#4a9eff"/>
+    "Low-to-High Cable Fly": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <rect x="164" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="86" r="5" fill="#444"/>
+      <circle cx="169" cy="86" r="5" fill="#444"/>
+      <rect x="60" y="70" width="60" height="20" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms sweep from low to high (up and inward) -->
       <g id="ltoh_arms">
-        <line x1="78" y1="56" x2="40" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="56" x2="140" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="40" y1="72" x2="20" y2="85" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-        <line x1="140" y1="72" x2="160" y2="85" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="90" y1="48" x2="36" y2="72" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="48" x2="144" y2="72" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="36" y1="72" x2="16" y2="84" stroke="#555" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="144" y1="72" x2="164" y2="84" stroke="#555" stroke-width="1.5" stroke-dasharray="3,3"/>
       </g>
-      <animateTransform xlink:href="#ltoh_arms" attributeName="transform" type="translate" values="0,0;0,-22;0,0" dur="2.2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#ltoh_arms" attributeName="transform" type="translate" values="0,0;0,-26;0,0" dur="2.2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Dumbbell Lateral Raises": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="60" y="68" width="60" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "Dumbbell Lateral Raise": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="70" width="60" height="20" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- both arms raise sideways to shoulder height -->
       <g id="dlr_arms">
-        <line x1="78" y1="57" x2="44" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="57" x2="136" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="28" y="43" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="25" cy="45" r="5" fill="#5ba8e0"/>
-        <circle cx="46" cy="45" r="5" fill="#5ba8e0"/>
-        <rect x="134" y="43" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="131" cy="45" r="5" fill="#5ba8e0"/>
-        <circle cx="152" cy="45" r="5" fill="#5ba8e0"/>
+        <line x1="90" y1="46" x2="40" y2="42" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="46" x2="140" y2="42" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="20" y="37" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="18" cy="39" r="5" fill="#5ba8e0"/><circle cx="38" cy="39" r="5" fill="#5ba8e0"/>
+        <rect x="144" y="37" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="142" cy="39" r="5" fill="#5ba8e0"/><circle cx="160" cy="39" r="5" fill="#5ba8e0"/>
       </g>
       <animateTransform xlink:href="#dlr_arms" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Cable Rear Delt Fly": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <rect x="160" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="42" r="6" fill="#444"/>
-      <circle cx="166" cy="42" r="6" fill="#444"/>
-      <rect x="62" y="60" width="56" height="36" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="44" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="44" width="24" height="16" rx="4" fill="#4a9eff"/>
+    "Cable Rear Delt Fly": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <rect x="164" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="40" r="5" fill="#444"/>
+      <circle cx="169" cy="40" r="5" fill="#444"/>
+      <rect x="60" y="62" width="60" height="26" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="24" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="32" x2="90" y2="36" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="36" x2="90" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="62" x2="74" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="62" x2="106" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms pull wide to the sides, cables cross -->
       <g id="crdf_arms">
-        <line x1="78" y1="52" x2="38" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="52" x2="142" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="90" y1="46" x2="34" y2="58" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="46" x2="146" y2="58" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="34" y1="58" x2="16" y2="40" stroke="#555" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="146" y1="58" x2="164" y2="40" stroke="#555" stroke-width="1.5" stroke-dasharray="3,3"/>
       </g>
       <animateTransform xlink:href="#crdf_arms" attributeName="transform" type="translate" values="0,0;0,-20;0,0" dur="2.2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Cable Triceps Press Down": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="145" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="151" cy="20" r="6" fill="#444"/>
-      <line x1="148" y1="26" x2="110" y2="40" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="50" y="58" width="70" height="38" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="85" cy="42" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="73" y="42" width="24" height="16" rx="4" fill="#4a9eff"/>
-      <line x1="73" y1="48" x2="56" y2="42" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="97" y1="48" x2="112" y2="42" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <g id="ctpd_forearm">
-        <line x1="56" y1="42" x2="54" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="112" y1="42" x2="114" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Cable Triceps Pushdown (Rope)": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="0" width="10" height="100" rx="3" fill="#222"/>
+      <circle cx="155" cy="14" r="5" fill="#444"/>
+      <line x1="155" y1="19" x2="112" y2="36" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="46" y="60" width="70" height="28" rx="4" fill="#2a2a2c"/>
+      <circle cx="80" cy="20" r="8" fill="#4a9eff"/>
+      <line x1="80" y1="28" x2="80" y2="32" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="80" y1="32" x2="80" y2="60" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="80" y1="60" x2="64" y2="76" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="60" x2="96" y2="76" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- upper arms pinned to sides, forearms push straight down -->
+      <line x1="80" y1="42" x2="58" y2="38" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="42" x2="104" y2="38" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <g id="ctpd_forearms">
+        <line x1="58" y1="38" x2="56" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="104" y1="38" x2="106" y2="62" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#ctpd_forearm" attributeName="transform" type="translate" values="0,-16;0,0;0,-16" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#ctpd_forearms" attributeName="transform" type="translate" values="0,-18;0,0;0,-18" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Cross-Body Cable Triceps Ext.": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="28" r="6" fill="#444"/>
-      <line x1="20" y1="32" x2="75" y2="50" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="62" y="64" width="60" height="34" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="92" cy="46" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="80" y="46" width="24" height="18" rx="4" fill="#4a9eff"/>
-      <line x1="80" y1="54" x2="60" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <g id="cbt_arm">
-        <line x1="104" y1="52" x2="128" y2="38" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="128" y1="38" x2="132" y2="20" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Cross-Body Cable Triceps Ext.": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="24" r="5" fill="#444"/>
+      <line x1="16" y1="28" x2="76" y2="48" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="60" y="66" width="60" height="24" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="66" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="66" x2="74" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="66" x2="106" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="46" x2="66" y2="42" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- one arm extends across body, forearm straightens -->
+      <line x1="90" y1="46" x2="118" y2="36" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <g id="cbt_forearm">
+        <line x1="118" y1="36" x2="122" y2="16" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#cbt_arm" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#cbt_forearm" attributeName="transform" type="translate" values="0,0;0,20;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Kneeling Cable Lat Pulldown": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="145" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="151" cy="16" r="6" fill="#444"/>
-      <line x1="148" y1="22" x2="112" y2="44" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <ellipse cx="80" cy="44" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="68" y="44" width="24" height="16" rx="4" fill="#4a9eff"/>
+    "Single-Arm Kneeling Lat Pulldown": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="0" width="10" height="58" rx="3" fill="#222"/>
+      <circle cx="155" cy="12" r="5" fill="#444"/>
+      <line x1="155" y1="17" x2="112" y2="40" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <circle cx="80" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="80" y1="30" x2="80" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="80" y1="34" x2="80" y2="66" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <!-- kneeling legs -->
+      <line x1="80" y1="66" x2="56" y2="80" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="56" y1="80" x2="54" y2="96" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="66" x2="104" y2="72" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="104" y1="72" x2="110" y2="90" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- both arms pull bar down from overhead -->
       <g id="kcl_arms">
-        <line x1="68" y1="50" x2="44" y2="36" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="92" y1="50" x2="114" y2="36" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="44" y1="36" x2="42" y2="20" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="114" y1="36" x2="116" y2="20" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="80" y1="44" x2="52" y2="30" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="80" y1="44" x2="108" y2="30" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="52" y1="30" x2="50" y2="14" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="108" y1="30" x2="110" y2="14" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <rect x="50" y="72" width="28" height="22" rx="4" fill="#2a2a2c" transform="rotate(-45 64 83)"/>
-      <rect x="82" y="72" width="28" height="22" rx="4" fill="#2a2a2c" transform="rotate(45 96 83)"/>
-      <animateTransform xlink:href="#kcl_arms" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#kcl_arms" attributeName="transform" type="translate" values="0,0;0,20;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Straight Arm Pulldown": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="145" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="151" cy="16" r="6" fill="#444"/>
-      <line x1="148" y1="22" x2="118" y2="36" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="48" y="62" width="70" height="34" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="83" cy="44" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="71" y="44" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "Straight-Arm Pulldown": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="0" width="10" height="100" rx="3" fill="#222"/>
+      <circle cx="155" cy="12" r="5" fill="#444"/>
+      <line x1="155" y1="17" x2="120" y2="30" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="44" y="62" width="70" height="26" rx="4" fill="#2a2a2c"/>
+      <circle cx="80" cy="20" r="8" fill="#4a9eff"/>
+      <line x1="80" y1="28" x2="80" y2="32" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="80" y1="32" x2="80" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="80" y1="62" x2="62" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="62" x2="98" y2="78" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- straight arms sweep from high to low -->
       <g id="sap_arms">
-        <line x1="71" y1="50" x2="44" y2="36" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="95" y1="50" x2="120" y2="36" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="44" y1="36" x2="42" y2="18" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="120" y1="36" x2="122" y2="18" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="80" y1="44" x2="44" y2="28" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="80" y1="44" x2="116" y2="28" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44" y1="28" x2="42" y2="12" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="116" y1="28" x2="118" y2="12" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#sap_arms" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#sap_arms" attributeName="transform" type="translate" values="0,0;0,20;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Seated Cable Rows": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="60" r="6" fill="#444"/>
-      <line x1="20" y1="60" x2="68" y2="54" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="30" y="70" width="120" height="12" rx="4" fill="#2a2a2c"/>
-      <ellipse cx="100" cy="44" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="88" y="44" width="24" height="26" rx="4" fill="#4a9eff"/>
-      <line x1="88" y1="60" x2="64" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="112" y1="60" x2="136" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Seated Cable Rows": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="58" r="5" fill="#444"/>
+      <line x1="16" y1="58" x2="70" y2="52" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="28" y="72" width="128" height="10" rx="4" fill="#2a2a2c"/>
+      <circle cx="100" cy="26" r="8" fill="#4a9eff"/>
+      <line x1="100" y1="34" x2="100" y2="38" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="100" y1="38" x2="100" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="100" y1="72" x2="80" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="100" y1="72" x2="120" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms pull handle toward torso -->
       <g id="scr_arms">
-        <line x1="88" y1="52" x2="56" y2="56" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="112" y1="52" x2="138" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="100" y1="50" x2="58" y2="54" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="100" y1="50" x2="142" y2="48" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#scr_arms" attributeName="transform" type="translate" values="14,0;0,0;14,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#scr_arms" attributeName="transform" type="translate" values="18,0;0,0;18,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Cable Curls": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="90" r="6" fill="#444"/>
-      <line x1="20" y1="87" x2="60" y2="66" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="58" y="68" width="68" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="92" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="80" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "Cable Curls": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="88" r="5" fill="#444"/>
+      <line x1="16" y1="85" x2="60" y2="66" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="58" y="70" width="66" height="22" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="50" x2="116" y2="56" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- cable arm curls up -->
       <g id="cc_arm">
-        <line x1="80" y1="60" x2="54" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="90" y1="50" x2="58" y2="66" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <line x1="104" y1="60" x2="116" y2="56" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <animateTransform xlink:href="#cc_arm" attributeName="transform" type="rotate" values="0 80 60;-40 80 60;0 80 60" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#cc_arm" attributeName="transform" type="rotate" values="0 90 50;-44 90 50;0 90 50" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "EZ-bar Curls": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="58" y="68" width="68" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="92" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="80" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "EZ-Bar Curls": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="70" width="64" height="20" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- both arms curl EZ bar upward -->
       <g id="ezb_arms">
-        <line x1="80" y1="60" x2="56" y2="50" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="104" y1="60" x2="128" y2="50" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <path d="M40 44 Q55 34 70 44 Q85 54 100 44 Q115 34 130 44 Q145 54 145 44" stroke="#7cc4ff" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <circle cx="34" cy="44" r="6" fill="#5ba8e0"/>
-        <circle cx="148" cy="44" r="6" fill="#5ba8e0"/>
+        <line x1="90" y1="50" x2="58" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="50" x2="122" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <path d="M34 38 Q50 28 66 38 Q82 48 98 38 Q114 28 130 38 Q146 48 150 38" stroke="#7cc4ff" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="28" cy="38" r="6" fill="#5ba8e0"/>
+        <circle cx="153" cy="38" r="6" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#ezb_arms" attributeName="transform" type="translate" values="0,0;0,-20;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#ezb_arms" attributeName="transform" type="translate" values="0,0;0,-22;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "EZ-bar Reverse Curl": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="58" y="68" width="68" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="92" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="80" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "EZ-Bar Reverse Curl": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="70" width="64" height="20" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="70" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="74" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="70" x2="106" y2="86" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- overhand grip curls same motion but palms face down -->
       <g id="ezr_arms">
-        <line x1="80" y1="60" x2="56" y2="56" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="104" y1="60" x2="128" y2="56" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <path d="M40 52 Q55 42 70 52 Q85 62 100 52 Q115 42 130 52 Q145 62 145 52" stroke="#7cc4ff" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <circle cx="34" cy="52" r="6" fill="#5ba8e0"/>
-        <circle cx="148" cy="52" r="6" fill="#5ba8e0"/>
+        <line x1="90" y1="50" x2="58" y2="50" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="50" x2="122" y2="50" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <path d="M34 46 Q50 36 66 46 Q82 56 98 46 Q114 36 130 46 Q146 56 150 46" stroke="#7cc4ff" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="28" cy="46" r="6" fill="#5ba8e0"/>
+        <circle cx="153" cy="46" r="6" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#ezr_arms" attributeName="transform" type="translate" values="0,0;0,-20;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#ezr_arms" attributeName="transform" type="translate" values="0,0;0,-22;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Cable Crossover": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <rect x="160" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="14" cy="24" r="6" fill="#444"/>
-      <circle cx="166" cy="24" r="6" fill="#444"/>
-      <line x1="20" y1="28" x2="68" y2="52" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <line x1="160" y1="28" x2="112" y2="52" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="62" y="68" width="56" height="30" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="48" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="48" width="24" height="20" rx="4" fill="#4a9eff"/>
+    "Cable Crossover": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <rect x="164" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="11" cy="20" r="5" fill="#444"/>
+      <circle cx="169" cy="20" r="5" fill="#444"/>
+      <line x1="16" y1="24" x2="68" y2="48" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="164" y1="24" x2="112" y2="48" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="60" y="68" width="60" height="22" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="68" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="68" x2="74" y2="84" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="68" x2="106" y2="84" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms sweep from high/wide down and together -->
       <g id="cco_arms">
-        <line x1="78" y1="58" x2="44" y2="68" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="58" x2="136" y2="68" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="90" y1="48" x2="36" y2="66" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="48" x2="144" y2="66" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#cco_arms" attributeName="transform" type="translate" values="0,0;0,-24;0,0" dur="2.2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#cco_arms" attributeName="transform" type="translate" values="0,0;0,-26;0,0" dur="2.2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Arnold Press": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="55" y="68" width="70" height="28" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="50" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="50" width="24" height="18" rx="4" fill="#4a9eff"/>
+    "Arnold Press": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="72" width="64" height="18" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="74" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="106" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms rotate and press overhead -->
       <g id="ap_arms">
-        <line x1="78" y1="58" x2="50" y2="46" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="102" y1="58" x2="130" y2="46" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="34" y="40" width="18" height="5" rx="2" fill="#7cc4ff" transform="rotate(-15 43 42)"/>
-        <circle cx="31" cy="43" r="5" fill="#5ba8e0"/>
-        <circle cx="52" cy="42" r="5" fill="#5ba8e0"/>
-        <rect x="128" y="40" width="18" height="5" rx="2" fill="#7cc4ff" transform="rotate(15 137 42)"/>
-        <circle cx="125" cy="42" r="5" fill="#5ba8e0"/>
-        <circle cx="148" cy="43" r="5" fill="#5ba8e0"/>
+        <line x1="90" y1="48" x2="56" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="90" y1="48" x2="124" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="38" y="35" width="16" height="4" rx="2" fill="#7cc4ff" transform="rotate(-10 46 37)"/>
+        <circle cx="36" cy="38" r="5" fill="#5ba8e0"/><circle cx="54" cy="37" r="5" fill="#5ba8e0"/>
+        <rect x="126" y="35" width="16" height="4" rx="2" fill="#7cc4ff" transform="rotate(10 134 37)"/>
+        <circle cx="124" cy="37" r="5" fill="#5ba8e0"/><circle cx="142" cy="38" r="5" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#ap_arms" attributeName="transform" type="translate" values="0,0;0,-16;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#ap_arms" attributeName="transform" type="translate" values="0,0;0,-18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Face Pull": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="160" y="5" width="12" height="100" rx="4" fill="#222"/>
-      <circle cx="166" cy="46" r="6" fill="#444"/>
-      <line x1="160" y1="46" x2="116" y2="46" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <rect x="40" y="66" width="80" height="32" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="80" cy="44" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="68" y="44" width="24" height="22" rx="4" fill="#4a9eff"/>
-      <line x1="68" y1="54" x2="46" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="92" y1="54" x2="114" y2="48" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Face Pull": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="162" y="2" width="10" height="96" rx="3" fill="#222"/>
+      <circle cx="167" cy="44" r="5" fill="#444"/>
+      <line x1="162" y1="44" x2="120" y2="44" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <rect x="36" y="66" width="80" height="24" rx="4" fill="#2a2a2c"/>
+      <circle cx="76" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="76" y1="30" x2="76" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="76" y1="34" x2="76" y2="66" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="76" y1="66" x2="58" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="76" y1="66" x2="94" y2="82" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- arms pull rope toward face, elbows flare wide -->
+      <line x1="76" y1="46" x2="52" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="76" y1="46" x2="116" y2="40" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="fp_forearms">
-        <line x1="46" y1="48" x2="38" y2="34" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="114" y1="48" x2="118" y2="34" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+        <line x1="52" y1="40" x2="44" y2="26" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="116" y1="40" x2="120" y2="26" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       </g>
-      <animateTransform xlink:href="#fp_forearms" attributeName="transform" type="translate" values="20,0;0,0;20,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#fp_forearms" attributeName="transform" type="translate" values="22,0;0,0;22,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Seated Triceps Press": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="55" y="68" width="70" height="28" rx="5" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="52" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="52" width="24" height="16" rx="4" fill="#4a9eff"/>
-      <line x1="78" y1="56" x2="62" y2="40" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="102" y1="56" x2="118" y2="40" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Seated Triceps Press": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="58" y="72" width="64" height="18" rx="4" fill="#2a2a2c"/>
+      <circle cx="90" cy="22" r="8" fill="#4a9eff"/>
+      <line x1="90" y1="30" x2="90" y2="34" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="90" y1="34" x2="90" y2="72" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="74" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="72" x2="106" y2="88" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- upper arms vertical overhead, forearms lower behind head then extend -->
+      <line x1="90" y1="46" x2="66" y2="36" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="90" y1="46" x2="114" y2="36" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="stp_forearms">
-        <line x1="62" y1="40" x2="66" y2="22" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="118" y1="40" x2="114" y2="22" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="60" y="16" width="60" height="6" rx="3" fill="#7cc4ff"/>
-        <circle cx="56" cy="19" r="6" fill="#5ba8e0"/>
-        <circle cx="124" cy="19" r="6" fill="#5ba8e0"/>
+        <line x1="66" y1="36" x2="70" y2="16" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="114" y1="36" x2="110" y2="16" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="64" y="10" width="52" height="5" rx="2" fill="#7cc4ff"/>
+        <circle cx="60" cy="12" r="6" fill="#5ba8e0"/>
+        <circle cx="120" cy="12" r="6" fill="#5ba8e0"/>
       </g>
-      <animateTransform xlink:href="#stp_forearms" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
+      <animateTransform xlink:href="#stp_forearms" attributeName="transform" type="translate" values="0,0;0,20;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
 
-    "Dumbbell Skullcrusher": `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg">
-      <rect x="20" y="74" width="140" height="10" rx="3" fill="#222"/>
-      <rect x="30" y="63" width="120" height="11" rx="3" fill="#2a2a2c"/>
-      <ellipse cx="90" cy="56" rx="9" ry="9" fill="#4a9eff"/>
-      <rect x="78" y="56" width="24" height="10" rx="4" fill="#4a9eff"/>
-      <line x1="78" y1="60" x2="58" y2="46" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-      <line x1="102" y1="60" x2="122" y2="46" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+    "Dumbbell Skullcrusher": `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="76" width="144" height="7" rx="3" fill="#333"/>
+      <rect x="28" y="67" width="124" height="9" rx="3" fill="#2a2a2c"/>
+      <!-- lying figure -->
+      <circle cx="34" cy="62" r="8" fill="#4a9eff"/>
+      <line x1="42" y1="62" x2="50" y2="62" stroke="#4a9eff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="62" x2="130" y2="62" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
+      <line x1="130" y1="62" x2="150" y2="56" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="130" y1="62" x2="148" y2="68" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <!-- upper arms point up, forearms lower dumbbells toward forehead -->
+      <line x1="72" y1="62" x2="68" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="94" y1="62" x2="98" y2="44" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
       <g id="dsc_forearms">
-        <line x1="58" y1="46" x2="62" y2="28" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <line x1="122" y1="46" x2="118" y2="28" stroke="#4a9eff" stroke-width="5" stroke-linecap="round"/>
-        <rect x="50" y="22" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="47" cy="24" r="5" fill="#5ba8e0"/>
-        <circle cx="68" cy="24" r="5" fill="#5ba8e0"/>
-        <rect x="112" y="22" width="18" height="5" rx="2" fill="#7cc4ff"/>
-        <circle cx="109" cy="24" r="5" fill="#5ba8e0"/>
-        <circle cx="130" cy="24" r="5" fill="#5ba8e0"/>
+        <line x1="68" y1="44" x2="54" y2="30" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <line x1="98" y1="44" x2="112" y2="30" stroke="#4a9eff" stroke-width="4" stroke-linecap="round"/>
+        <rect x="38" y="24" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="36" cy="26" r="5" fill="#5ba8e0"/><circle cx="54" cy="26" r="5" fill="#5ba8e0"/>
+        <rect x="112" y="24" width="16" height="4" rx="2" fill="#7cc4ff"/>
+        <circle cx="110" cy="26" r="5" fill="#5ba8e0"/><circle cx="128" cy="26" r="5" fill="#5ba8e0"/>
       </g>
       <animateTransform xlink:href="#dsc_forearms" attributeName="transform" type="translate" values="0,0;0,18;0,0" dur="2s" repeatCount="indefinite"/>
     </svg>`,
   };
-  return a[name] || `<svg viewBox="0 0 180 110" xmlns="http://www.w3.org/2000/svg"><text x="90" y="60" text-anchor="middle" fill="#4a9eff" font-size="32">🏋️</text></svg>`;
+  return a[name] || `<svg viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg"><text x="90" y="55" text-anchor="middle" fill="#4a9eff" font-size="28">🏋️</text></svg>`;
 }
+
 
 // ─── DATA & STATE ──────────────────────────────────────────────────────
 const days = Object.keys(program);
@@ -666,7 +762,9 @@ function renderNav() {
 
 function toggleCard(ei) {
   openCards[activeDay] = openCards[activeDay] || {};
-  openCards[activeDay][ei] = !openCards[activeDay][ei];
+  const isOpen = openCards[activeDay][ei];
+  openCards[activeDay] = {};
+  openCards[activeDay][ei] = !isOpen;
   renderExercises();
 }
 
